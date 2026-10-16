@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.pytest_cache/
+# local data (large / not ours to redistribute)
+data/raw/
+data/images/
+data/cache/
+data/sample/*.jsonl
+!data/sample/demo_reviews.jsonl
