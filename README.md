@@ -1,23 +1,24 @@
 # LoopLens
 
-**Human-in-the-loop multi-agent coding of customer reviews that include photos.**
+**Did you get what the listing promised? Human-in-the-loop AI that checks online product listings against what buyers actually received.**
 
-LoopLens takes product reviews with customer photos, lets a small team of AI agents suggest qualitative codes and themes, and puts a human reviewer in control at two checkpoints (accept, edit or reject). Every code links back to its evidence in the text or the photo.
+LoopLens pairs each product listing (title, description, seller photo) with a customer review and the customer's own photo. A small team of AI agents compares the two and flags mismatches: wrong item, wrong colour, smaller than listed, damaged, missing parts, or a suspected fake. A human reviewer confirms or overrules every flag, and every verdict links back to its evidence.
 
-The project also answers a research question with numbers: *does an agent team with a human in the loop code multimodal reviews better than a single vision-language model, at the same token cost?*
+It also answers a question with numbers: *does an agent team with a human in the loop catch listing mismatches more accurately than a single vision-language model, at the same token cost?*
 
-> Status: **week 1 of 6**. The project skeleton, the data sampler, a draft codebook and the single-model baseline are in place. The agent pipeline and the review UI come next.
+> Status: **week 1 of 6**. The API, data builder, mismatch taxonomy and single-model baseline are in place. The agent pipeline and review UI come next.
 
 ## How it will work
 
 ```
 Web app (React)  <->  API (FastAPI)  <->  Storage
                          |
-                  Agent pipeline (background job)
-   Preprocessing -> Coding -> [You review] -> Cross-modal -> Themes
-   -> [You review] -> Validation -> Explainability -> Report
+               Agent pipeline (background job)
+  Listing reader -> Photo inspector -> Comparer -> Judge -> Explainer
                          |
-             Vision-language model (hosted or local)
+               [ You confirm or overrule ]
+                         |
+           Vision-language model (hosted or local)
 ```
 
 ## Quick start
@@ -32,10 +33,10 @@ cp .env.example .env        # Windows: copy .env.example .env
 
 pytest -q                   # 8 tests, no API key needed
 uvicorn app.main:app --reload
-# open http://127.0.0.1:8000/docs to try the API
+# open http://127.0.0.1:8000/docs
 ```
 
-Out of the box LoopLens uses the **mock** model: no network and no cost. It runs on 6 synthetic demo reviews, so you can build and test everything offline.
+Out of the box LoopLens uses the **mock** model: no network and no cost. It runs on 6 synthetic demo cases, so you can build and test offline.
 
 ## Real data
 
@@ -43,7 +44,7 @@ Out of the box LoopLens uses the **mock** model: no network and no cost. It runs
 python -m scripts.sample_reviews --category All_Beauty --n 300
 ```
 
-This streams the [Amazon Reviews 2023](https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023) dataset (McAuley Lab, UCSD), keeps reviews that have a customer photo, samples 300 with a fixed seed and downloads their photos to `data/images/`. The data stays local and is not committed. Check the dataset's terms before publishing any of it.
+This builds 300 cases from [Amazon Reviews 2023](https://huggingface.co/datasets/McAuley-Lab/Amazon-Reviews-2023) (McAuley Lab, UCSD). Each case pairs a review that has a customer photo with its product listing, joined on `parent_asin`. Half the sample is 1–2 star reviews, so mismatches are well represented. Photos go to `data/images/reviews/` and `data/images/listings/`. The data stays local and is not committed. Check the dataset's terms before publishing any of it.
 
 ## Real model
 
@@ -59,33 +60,33 @@ LOOPLENS_API_KEY=
 Then run the baseline:
 
 ```bash
-python -m scripts.run_baseline --limit 10
+python -m scripts.run_single_model --limit 10
 ```
 
-Every model response is cached in `data/cache/`, so re-running an experiment costs nothing.
+Each call sends the listing photo and the customer photo with the text. Every response is cached in `data/cache/`, so re-running an experiment costs nothing.
 
 ## Project layout
 
 | Path | What it is |
 | --- | --- |
-| `looplens/codebook.py` | Loads and validates the codebook |
-| `looplens/model.py` | Vision-language model client (mock + OpenAI-compatible) with a disk cache |
-| `looplens/baseline.py` | Setup 1: the single-model baseline and a strict JSON parser |
-| `app/main.py` | FastAPI app: `/health`, `/codebook`, `/reviews`, `/reviews/{id}/baseline` |
-| `scripts/sample_reviews.py` | Downloads and samples reviews with photos |
-| `scripts/run_baseline.py` | Runs the baseline over the sample and reports tokens |
-| `data/codebook/codebook.yaml` | The codebook: draft v0.1 |
+| `data/taxonomy/mismatch_types.yaml` | Verdicts (match / mismatch / unclear) and 8 mismatch types: draft v0.1 |
+| `looplens/data.py` | `Case` = listing + customer review, and loaders |
+| `looplens/model.py` | Vision-language model client (mock + OpenAI-compatible), multi-image, disk cache |
+| `looplens/single_model.py` | Setup 1: the single-model baseline and a strict JSON parser |
+| `app/main.py` | FastAPI: `/health`, `/taxonomy`, `/cases`, `/cases/{id}/single-model` |
+| `scripts/sample_reviews.py` | Builds the dataset (reviews + listings + photos) |
+| `scripts/run_single_model.py` | Runs the baseline over all cases and reports tokens |
 | `tests/` | pytest suite, run by GitHub Actions on every push |
 
 ## Roadmap
 
-- [x] Week 1: foundations, data sampler, codebook draft, single-model baseline
-- [ ] Week 2: seven agent functions, pipeline runner, job queue
-- [ ] Week 3: review UI (upload, accept, edit, reject, both checkpoints)
-- [ ] Week 4: themes dashboard, evidence view, export, **live demo**
-- [ ] Week 5: 100-review gold set, three-way evaluation (F1, kappa, cost)
+- [x] Week 1: foundations, dataset builder, mismatch taxonomy, single-model baseline
+- [ ] Week 2: agent pipeline (listing reader, photo inspector, comparer, judge, explainer)
+- [ ] Week 3: review UI (side-by-side listing vs customer photo, confirm or overrule)
+- [ ] Week 4: mismatch dashboard, evidence view, export, **live demo**
+- [ ] Week 5: 100-case gold set, three-way evaluation (accuracy, F1, kappa, cost)
 - [ ] Week 6: results, video, write-up
 
 ## Author
 
-Built by [Mehrun-Nisa Rahman](https://github.com/Mehrun-NisaRahman) as an independent solo project related to her undergraduate thesis on human-in-the-loop multi-agent vision-language AI.
+Built by [Mehrun-Nisa Rahman](https://github.com/Mehrun-NisaRahman) as an independent solo project.

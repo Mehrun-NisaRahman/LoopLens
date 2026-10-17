@@ -13,9 +13,9 @@ except ImportError:  # pragma: no cover
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-CODEBOOK_PATH = DATA / "codebook" / "codebook.yaml"
-SAMPLE_PATH = DATA / "sample" / "reviews.jsonl"
-DEMO_PATH = DATA / "sample" / "demo_reviews.jsonl"
+TAXONOMY_PATH = DATA / "taxonomy" / "mismatch_types.yaml"
+SAMPLE_PATH = DATA / "sample" / "cases.jsonl"
+DEMO_PATH = DATA / "sample" / "demo_cases.jsonl"
 IMAGES_DIR = DATA / "images"
 CACHE_DIR = DATA / "cache"
 

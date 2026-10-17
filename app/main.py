@@ -1,48 +1,47 @@
-"""LoopLens API (week 1 skeleton). Run:  uvicorn app.main:app --reload"""
+"""LoopLens API. Run:  uvicorn app.main:app --reload   then open http://127.0.0.1:8000/docs"""
 from __future__ import annotations
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from looplens import __version__, config
-from looplens.baseline import CodingResult, code_review
-from looplens.codebook import Codebook, load_codebook
-from looplens.data import Review, load_reviews
+from looplens.data import Case, load_cases
 from looplens.model import ModelClient
+from looplens.single_model import CheckResult, check_case
+from looplens.taxonomy import Taxonomy, load_taxonomy
 
-app = FastAPI(title="LoopLens API", version=__version__)
+app = FastAPI(title="LoopLens API", version=__version__,
+              description="Does what the buyer received match the listing? AI checks, a human decides.")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173"], allow_methods=["*"], allow_headers=["*"])
 
-_book: Codebook = load_codebook()
-_reviews: dict[str, Review] = {r.id: r for r in load_reviews()}
+_tax: Taxonomy = load_taxonomy()
+_cases: dict[str, Case] = {c.id: c for c in load_cases()}
 _client = ModelClient()
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "version": __version__, "provider": config.PROVIDER, "reviews": len(_reviews)}
+    return {"status": "ok", "version": __version__, "provider": config.PROVIDER, "cases": len(_cases)}
 
 
-@app.get("/codebook", response_model=Codebook)
-def get_codebook() -> Codebook:
-    return _book
+@app.get("/taxonomy", response_model=Taxonomy)
+def get_taxonomy() -> Taxonomy:
+    return _tax
 
 
-@app.get("/reviews", response_model=list[Review])
-def list_reviews(limit: int = 20, offset: int = 0) -> list[Review]:
-    items = list(_reviews.values())
-    return items[offset: offset + limit]
+@app.get("/cases", response_model=list[Case])
+def list_cases(limit: int = 20, offset: int = 0) -> list[Case]:
+    return list(_cases.values())[offset: offset + limit]
 
 
-@app.get("/reviews/{review_id}", response_model=Review)
-def get_review(review_id: str) -> Review:
-    if review_id not in _reviews:
-        raise HTTPException(404, "Review not found")
-    return _reviews[review_id]
+@app.get("/cases/{case_id}", response_model=Case)
+def get_case(case_id: str) -> Case:
+    if case_id not in _cases:
+        raise HTTPException(404, "Case not found")
+    return _cases[case_id]
 
 
-@app.post("/reviews/{review_id}/baseline", response_model=CodingResult)
-def run_baseline(review_id: str) -> CodingResult:
-    """Code one review with the single-model baseline."""
-    review = get_review(review_id)
-    return code_review(review, _book, _client)
+@app.post("/cases/{case_id}/single-model", response_model=CheckResult)
+def run_single_model(case_id: str) -> CheckResult:
+    """Check one case with the single-model baseline."""
+    return check_case(get_case(case_id), _tax, _client)

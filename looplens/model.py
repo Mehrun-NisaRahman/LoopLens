@@ -35,12 +35,12 @@ def _image_as_data_url(path: Path) -> str:
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode()}"
 
 
-def _cache_key(model: str, system: str, user: str, image: Path | None) -> str:
+def _cache_key(model: str, system: str, user: str, images: list[Path]) -> str:
     h = hashlib.sha256()
     for part in (model, system, user):
         h.update(part.encode("utf-8"))
         h.update(b"\x00")
-    if image and image.exists():
+    for image in images:
         h.update(image.read_bytes())
     return h.hexdigest()[:32]
 
@@ -56,23 +56,25 @@ class ModelClient:
         self.cache_dir = cache_dir or config.CACHE_DIR
 
     # ---- public -------------------------------------------------------
-    def complete(self, system: str, user: str, image: Path | None = None) -> ModelReply:
+    def complete(self, system: str, user: str, images: list[Path] | None = None) -> ModelReply:
+        """Ask the model. `images` are sent in order after the text (e.g. listing photo, then customer photo)."""
+        images = [p for p in (images or []) if p and p.exists()]
         if self.provider == "mock":
-            return self._mock(user, image)
-        key = _cache_key(self.model, system, user, image)
+            return self._mock(user, images)
+        key = _cache_key(self.model, system, user, images)
         hit = self.cache_dir / f"{key}.json"
         if hit.exists():
             d = json.loads(hit.read_text(encoding="utf-8"))
             return ModelReply(d["text"], d.get("prompt_tokens", 0), d.get("completion_tokens", 0), cached=True)
-        reply = self._openai(system, user, image)
+        reply = self._openai(system, user, images)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         hit.write_text(json.dumps(reply.__dict__), encoding="utf-8")
         return reply
 
     # ---- providers ----------------------------------------------------
-    def _openai(self, system: str, user: str, image: Path | None) -> ModelReply:
+    def _openai(self, system: str, user: str, images: list[Path]) -> ModelReply:
         content: list[dict] = [{"type": "text", "text": user}]
-        if image and image.exists():
+        for image in images:
             content.append({"type": "image_url", "image_url": {"url": _image_as_data_url(image)}})
         headers = {"Content-Type": "application/json"}
         if self.api_key:
@@ -93,25 +95,24 @@ class ModelClient:
         )
 
     @staticmethod
-    def _mock(user: str, image: Path | None) -> ModelReply:
-        """Deterministic fake: picks codes from simple keywords so the pipeline can be built offline."""
-        # look only at the review itself, not the codebook part of the prompt
+    def _mock(user: str, images: list[Path]) -> ModelReply:
+        """Deterministic fake: judges from keywords in the customer review so the app can be built offline."""
         lower = user.lower()
-        start = lower.find("review text:")
-        end = lower.find("photo attached:")
+        start, end = lower.find("customer review:"), lower.find("images attached:")
         text = lower[start:end] if start != -1 else lower
         rules = {
-            "quality_negative": ("broke", "cheap", "doesn't work", "stopped", "poor"),
-            "quality_positive": ("love", "great", "works", "amazing", "perfect"),
-            "price_value": ("price", "worth", "value", "expensive", "$"),
-            "packaging": ("package", "box", "leak", "arrived", "shipping"),
-            "not_as_described": ("smaller", "different", "not as", "wrong"),
-            "would_repurchase": ("buy again", "recommend", "repurchase"),
+            "wrong_item": ("wrong item", "different product", "not the one", "sent me the wrong"),
+            "colour_shade": ("wrong color", "wrong colour", "wrong shade", "different shade", "different color", "nothing like the", "darker than", "lighter than"),
+            "size_quantity": ("smaller", "tiny", "travel size", "only got", "half the size"),
+            "damaged_defective": ("broken", "leak", "crushed", "cracked", "doesn't work", "stopped working"),
+            "counterfeit_suspected": ("fake", "counterfeit", "not genuine", "knock off", "knockoff"),
+            "missing_parts": ("missing", "didn't include", "no brush", "no cap"),
         }
-        codes = [
-            {"code": cid, "evidence": next(k for k in kws if k in text), "confidence": 0.6}
-            for cid, kws in rules.items() if any(k in text for k in kws)
-        ]
-        if image is not None:
-            codes.append({"code": "photo_supports_text", "evidence": "(image)", "confidence": 0.4})
-        return ModelReply(text=json.dumps({"codes": codes}), prompt_tokens=len(user) // 4, completion_tokens=40)
+        found = [{"type": t, "evidence": next(k for k in kws if k in text)}
+                 for t, kws in rules.items() if any(k in text for k in kws)]
+        positive = any(k in text for k in ("as described", "as pictured", "exactly like", "matches", "as shown"))
+        verdict = "mismatch" if found else ("match" if positive else "unclear")
+        reply = {"verdict": verdict, "types": found, "confidence": 0.6 if found or positive else 0.3,
+                 "explanation": "Mock model: keyword rules on the review text."}
+        return ModelReply(text=json.dumps(reply), prompt_tokens=len(user) // 4 + 250 * len(images),
+                          completion_tokens=60)

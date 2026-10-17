@@ -9,4 +9,5 @@ data/raw/
 data/images/
 data/cache/
 data/sample/*.jsonl
-!data/sample/demo_reviews.jsonl
+!data/sample/demo_cases.jsonl
+data/viewer.html

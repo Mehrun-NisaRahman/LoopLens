@@ -1,16 +1,17 @@
 # Week 1 checklist
 
-Goal: by the end of the week you can code real reviews with one model call each and see the token cost.
+Goal: by the end of the week you have 300 real cases (listing + customer review + both photos) and can check them with one model call each, with the token cost shown.
 
-- [ ] Message your supervisor and teammates about this solo project
-- [ ] Install Python 3.11+, Git and VS Code; clone the repo; `pip install -r requirements.txt`
-- [ ] `pytest -q` passes (8 tests)
-- [ ] `uvicorn app.main:app --reload` → open `/docs` and try every endpoint
-- [ ] Run `python -m scripts.sample_reviews` → 300 reviews and photos in `data/`
-- [ ] Read 30 of the sampled reviews and **edit `data/codebook/codebook.yaml`**: add, remove or rename codes so they fit what you actually see (aim for 8–12)
+- [x] Install Python, Git and VS Code; clone the repo; install requirements
+- [x] `pytest -q` passes
+- [x] API runs and `/docs` works
+- [ ] Apply the v0.2 update (listing-mismatch pivot) and re-run `pytest -q`
+- [ ] Run `python -m scripts.sample_reviews` → 300 cases in `data/sample/cases.jsonl`
+- [ ] Look at 30 cases side by side (listing photo + description vs customer photo + review)
+- [ ] **Edit `data/taxonomy/mismatch_types.yaml`**: add, merge or rename types to fit what you actually see
 - [ ] Choose a model: local (Ollama + a vision model) or a hosted API with a free tier; fill in `.env`
-- [ ] `python -m scripts.run_baseline --limit 10` works with the real model
-- [ ] Look at the 10 results by hand: which codes look wrong? Write 3 notes in this file
+- [ ] `python -m scripts.run_single_model --limit 10` works with the real model
+- [ ] Check those 10 verdicts by hand: which are wrong, and why? Write 3 notes below
 - [ ] Commit and push; the green "tests" check appears on GitHub
 
 ## Notes
