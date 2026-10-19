@@ -1,4 +1,4 @@
-# LoopLens mismatch taxonomy v0.1 — a DRAFT. Edit it after reading real cases.
+# LoopLens mismatch taxonomy v0.2 — refined after hand-labelling 30 real cases (week 1).
 # A case = one product listing + one customer review with a photo.
 # Verdict: does what the customer received match what the listing promised?
 verdicts:
@@ -7,13 +7,23 @@ verdicts:
   - id: mismatch
     definition: The customer received something that differs from what the listing promised.
   - id: unclear
-    definition: Not enough evidence to decide (photo unrelated, review vague, listing empty).
+    definition: Not enough evidence to decide (photo unrelated, review vague, listing has no usable photo or text).
 
-# If the verdict is mismatch, which kinds of mismatch apply (one or more).
+# Judging rules, learned from the first 30 cases.
+rules:
+  - Use all the evidence together - listing title, description and photo, the review text and the customer photo.
+  - A specific statement in the review ("came with 200, not 1000", "lid missing") is enough for mismatch, even if the photo cannot show it.
+  - Dislike, opinion or a low rating alone is NOT a mismatch ("not the best", "hard to put on", "ok for the price").
+  - If the listing title or description and the listing photo disagree, the written listing is the promise.
+  - If the listing photo is missing or is not the product (e.g. a "sold out" banner), the verdict is unclear unless the review text alone is decisive.
+  - Damaged on arrival is damaged_defective; arrived fine but broke during normal use is quality_far_below.
+  - Pick the single type that best explains the problem. Add a second type only for a genuinely separate problem.
+
+# If the verdict is mismatch, which kinds of mismatch apply.
 types:
   - id: wrong_item
     name: Wrong item
-    definition: A different product, brand or model than the one listed.
+    definition: A different product, brand, model or version than listed - including a sample, tester or used unit instead of the retail product.
     needs_image: true
   - id: colour_shade
     name: Colour or shade differs
@@ -21,25 +31,25 @@ types:
     needs_image: true
   - id: size_quantity
     name: Size or quantity differs
-    definition: Smaller, larger, fewer pieces or less volume than listed.
+    definition: Smaller, larger, fewer pieces or less volume than the listing states.
     needs_image: false
   - id: damaged_defective
-    name: Damaged or defective on arrival
-    definition: Broken, leaking, crushed or not working when it arrived.
+    name: Damaged or defective
+    definition: Broken, leaking, crushed or not working when it arrived (before use).
     needs_image: true
   - id: counterfeit_suspected
     name: Suspected fake
-    definition: Packaging, labels or quality suggest it is not genuine.
+    definition: Packaging, labels or markings suggest it is not genuine.
     needs_image: true
   - id: missing_parts
     name: Missing parts or accessories
-    definition: Items, parts or accessories promised in the listing are missing.
+    definition: An item, part or accessory named in the listing is missing.
     needs_image: false
   - id: quality_far_below
     name: Quality far below listing
-    definition: Materials or build are clearly worse than the listing claims.
+    definition: Arrived intact but is cheaply made - breaks, falls apart or wears out quickly during normal use, or materials are clearly worse than the listing presents.
     needs_image: false
   - id: feature_claim_false
     name: Feature claim false
-    definition: A specific claimed feature or effect (e.g. "waterproof", "24h wear") does not hold.
+    definition: A specific written claim in the listing (e.g. "no shedding", "absorbent", "waterproof", "24h wear") does not hold.
     needs_image: false

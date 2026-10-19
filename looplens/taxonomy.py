@@ -24,6 +24,7 @@ class MismatchType(BaseModel):
 class Taxonomy(BaseModel):
     verdicts: list[Verdict]
     types: list[MismatchType]
+    rules: list[str] = []
 
     @property
     def verdict_ids(self) -> set[str]:
@@ -36,7 +37,9 @@ class Taxonomy(BaseModel):
     def as_prompt(self) -> str:
         v = "\n".join(f"- {x.id}: {x.definition}" for x in self.verdicts)
         t = "\n".join(f"- {x.id}: {x.definition}" for x in self.types)
-        return f"Verdicts:\n{v}\n\nMismatch types (only if verdict is mismatch):\n{t}"
+        r = "\n".join(f"- {x}" for x in self.rules)
+        rules = f"\n\nRules:\n{r}" if r else ""
+        return f"Verdicts:\n{v}{rules}\n\nMismatch types (only if verdict is mismatch):\n{t}"
 
 
 def load_taxonomy(path: Path | None = None) -> Taxonomy:
