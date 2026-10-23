@@ -57,7 +57,7 @@ def load_gold(path: Path) -> dict[str, Gold]:
         return {r["case_id"]: Gold(r["case_id"], r["verdict"].strip().lower(),
                                    {t.strip().lower() for t in r["types"].split(";") if t.strip()},
                                    r.get("photo_role", ""), r.get("note", ""))
-                for r in csv.DictReader(f)}
+                for r in csv.DictReader(f) if (r.get("verdict") or "").strip()}  # skip unlabelled rows
 
 
 def load_preds(path: Path) -> dict[str, Pred]:

@@ -3,6 +3,7 @@
 Usage:
     python -m scripts.make_viewer            # all cases
     python -m scripts.make_viewer --n 30     # first 30
+    python -m scripts.make_viewer --start 31 --n 30   # cases 31-60
 Then open data/viewer.html in your browser (double-click it). It works offline and stays on your computer.
 """
 from __future__ import annotations
@@ -54,10 +55,12 @@ def img(path: str | None) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=None)
+    ap.add_argument("--start", type=int, default=1, help="number of the first case to show (1 = first)")
     args = ap.parse_args()
-    cases = load_cases()[: args.n]
+    first = max(1, args.start)
+    cases = load_cases()[first - 1:][: args.n]
     parts = []
-    for i, c in enumerate(cases, 1):
+    for i, c in enumerate(cases, first):
         stars = "★" * int(c.rating or 0) + "☆" * (5 - int(c.rating or 0))
         parts.append(CASE.format(
             i=i, id=html.escape(c.id), stars=stars,

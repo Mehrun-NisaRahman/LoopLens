@@ -1,0 +1,31 @@
+case_id,verdict,types,photo_role,note
+e9bde98a7c95,mismatch,quality_far_below,confirms,Listing says mini so size is fine; poor buffer and less than 100 grit
+b18ddef89b3e,match,,confirms,Good quantity and good price
+5ccc4b018b02,mismatch,missing_parts,no_help,Bells arrived without the jingles; listing never said they would lack them
+949d0df67fcc,match,,confirms,Positive review
+b6b701188fc4,mismatch,quality_far_below,confirms,Quality lower than claimed
+dc327dea8019,match,,no_help,Good review; 4 stars with a small complaint
+8c40e40adbe4,match,,confirms,Positive review
+d570991c0fbc,mismatch,size_quantity,no_help,Paid for 18 inch but received 14 inch (type set by size rule)
+eb880127decc,mismatch,size_quantity,no_help,Customer says they are NOT 3 inches (type set by size rule)
+13465fab83e9,match,,no_help,Positive review
+d8ad36e57a6f,match,,confirms,Listing gives no size; product matches the listing picture
+3407d513e72f,mismatch,quality_far_below,confirms,Packaging broke after a few days of use
+f7714c2293f5,mismatch,feature_claim_false,no_help,Not coffin shaped and not made of gel
+ef5ddc0c91ae,match,,confirms,Great buy; fun colors
+9b779248a6db,mismatch,damaged_defective,confirms,Hair arrived thin and damaged
+90f82656985e,match,,no_help,Positive review; 4 stars with a small complaint
+7a70ac043fb4,mismatch,damaged_defective,confirms,Arrived completely broken and spilling shimmer
+1e1610bbda0b,match,,confirms,High quality product
+1dc6a318556d,match,,confirms,Positive review
+d62e63f2bf4f,mismatch,quality_far_below,confirms,Zip-tied to the stick; not the traditional way it is made
+e2dd3cf1ed1d,mismatch,counterfeit_suspected,confirms,Not the same product the customer used before
+065cfe58767b,match,,confirms,Love these; highly recommend
+5872a1fb51ab,unclear,,no_help,Review talks about colour correcting to skin tone; listing claims nothing like this
+503f397ae5b0,mismatch,quality_far_below,confirms,Ends look nappy and braids weirdly proportioned
+8b796a9e7784,mismatch,quality_far_below,no_help,Pillow suction does not stay put and it is not that soft
+cff5ed35e8b7,match,,confirms,Positive review
+0a6d9c6d1498,mismatch,colour_shade,confirms,Colour is dark wine and not glittery or sparkly
+446b706751fb,match,,no_help,All positive except the smell which is personal taste
+2df052feb0e5,mismatch,quality_far_below,confirms,Does not look like the photo; very stiff
+4cf0aea35e16,match,,confirms,Positive review

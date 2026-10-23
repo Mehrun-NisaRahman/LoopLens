@@ -47,3 +47,9 @@ So both modes are kept and measured on the gold set:
 - **smart**: Router decides
 
 Report accuracy, tokens and cost for each in the README.
+
+## 8. Confirm on a held-out set before claiming a win (week 2)
+On the 30 week-1 cases both pipeline modes scored 100% (kappa 1.00) vs 97% for the single model.
+But the taxonomy rules were written while looking at those same 30 cases, so the score is optimistic.
+Next: label cases 31-60 *before* looking at any AI output, then compare all setups on that fresh set.
+
