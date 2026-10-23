@@ -27,3 +27,13 @@ def test_single_model_endpoint_returns_a_verdict():
     r = client.post(f"/cases/{cid}/single-model")
     assert r.status_code == 200
     assert r.json()["verdict"] in {"match", "mismatch", "unclear"}
+
+
+def test_pipeline_endpoint():
+    from fastapi.testclient import TestClient
+    from app.main import app
+    c = TestClient(app)
+    case_id = c.get("/cases").json()[0]["id"]
+    r = c.post(f"/cases/{case_id}/pipeline?mode=full")
+    assert r.status_code == 200 and r.json()["mode"] == "full"
+    assert c.post(f"/cases/{case_id}/pipeline?mode=bogus").status_code == 400

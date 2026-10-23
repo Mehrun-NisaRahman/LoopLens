@@ -32,6 +32,9 @@ class Pred:
     verdict: str
     types: set[str]
     explanation: str = ""
+    tokens: int = 0
+    calls: int = 1
+    photo_role: str = ""
 
 
 @dataclass
@@ -45,6 +48,8 @@ class Report:
     disagreements: list[tuple[Gold, Pred]] = field(default_factory=list)
     type_diffs: list[tuple[Gold, Pred]] = field(default_factory=list)
     missing: list[str] = field(default_factory=list)
+    tokens_per_case: float = 0.0
+    calls_per_case: float = 0.0
 
 
 def load_gold(path: Path) -> dict[str, Gold]:
@@ -61,7 +66,9 @@ def load_preds(path: Path) -> dict[str, Pred]:
         if line.strip():
             d = json.loads(line)
             out[d["case_id"]] = Pred(d["case_id"], d["verdict"],
-                                     {t["type"] for t in d.get("types", [])}, d.get("explanation", ""))
+                                     {t["type"] for t in d.get("types", [])}, d.get("explanation", ""),
+                                     d.get("prompt_tokens", 0) + d.get("completion_tokens", 0),
+                                     d.get("calls", 1), d.get("photo_role", ""))
     return out
 
 
@@ -113,4 +120,6 @@ def score(gold: dict[str, Gold], preds: dict[str, Pred]) -> Report:
         type_diffs=[(gold[i], preds[i]) for i in ids
                     if gold[i].verdict == preds[i].verdict == "mismatch" and gold[i].types != preds[i].types],
         missing=[i for i in gold if i not in preds],
+        tokens_per_case=sum(preds[i].tokens for i in ids) / len(ids) if ids else 0.0,
+        calls_per_case=sum(preds[i].calls for i in ids) / len(ids) if ids else 0.0,
     )

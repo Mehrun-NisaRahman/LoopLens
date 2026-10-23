@@ -35,6 +35,8 @@ def main() -> None:
     p, r, f = rep.types_prf
     print(f"Mismatch types   : precision {p:.0%}  recall {r:.0%}  F1 {f:.2f}")
 
+    print(f"Cost             : {rep.tokens_per_case:,.0f} tokens and {rep.calls_per_case:.1f} model calls per case")
+
     print("\nConfusion (rows = you, columns = AI)")
     print(" " * 10 + "".join(f"{v:>10}" for v in VERDICTS))
     for gv in VERDICTS:

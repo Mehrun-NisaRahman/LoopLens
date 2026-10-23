@@ -62,7 +62,7 @@ class ModelClient:
         """Ask the model. `images` are sent in order after the text (e.g. listing photo, then customer photo)."""
         images = [p for p in (images or []) if p and p.exists()]
         if self.provider == "mock":
-            return self._mock(user, images)
+            return self._mock(system, user, images)
         key = _cache_key(self.model, system, user, images)
         hit = self.cache_dir / f"{key}.json"
         if hit.exists():
@@ -96,11 +96,16 @@ class ModelClient:
         )
 
     @staticmethod
-    def _mock(user: str, images: list[Path]) -> ModelReply:
-        """Deterministic fake: judges from keywords in the customer review so the app can be built offline."""
+    def _mock(system: str, user: str, images: list[Path]) -> ModelReply:
+        """Deterministic fake so the app and pipeline can be built offline.
+
+        Judges from keywords in the customer review. Pipeline agents are recognised by the
+        "[agent:...]" tag in their system prompt and get a reply in their own JSON shape.
+        """
         lower = user.lower()
-        start, end = lower.find("customer review:"), lower.find("images attached:")
-        text = lower[start:end] if start != -1 else lower
+        start = lower.find("customer review:")
+        ends = [i for i in (lower.find("images attached:"), lower.find("end of review")) if i > start]
+        text = lower[start:min(ends)] if start != -1 and ends else (lower[start:] if start != -1 else lower)
         rules = {
             "wrong_item": ("wrong item", "different product", "not the one", "sent me the wrong"),
             "colour_shade": ("wrong color", "wrong colour", "wrong shade", "different shade", "different color", "nothing like the", "darker than", "lighter than"),
@@ -113,10 +118,17 @@ class ModelClient:
                  for t, kws in rules.items() if any(k in text for k in kws)]
         positive = any(k in text for k in ("as described", "as pictured", "exactly like", "matches", "as shown"))
         verdict = "mismatch" if found else ("match" if positive else "unclear")
-        reply = {"verdict": verdict, "types": found, "confidence": 0.6 if found or positive else 0.3,
-                 "explanation": "Mock model: keyword rules on the review text."}
-        return ModelReply(text=json.dumps(reply), prompt_tokens=len(user) // 4 + 250 * len(images),
-                          completion_tokens=60)
+        tokens = len(user) // 4 + 250 * len(images)
+        if "[agent:router]" in system:
+            reply = {"complaints": [f["evidence"] for f in found], "text_verdict": verdict,
+                     "confidence": 0.9 if positive and not found else 0.6, "reason": "Mock router."}
+        elif "[agent:photo-inspector]" in system:
+            reply = {"same_product": "yes", "complaints": [], "visible_problems": [],
+                     "observations": "Mock inspector: nothing checked."}
+        else:  # single model or judge
+            reply = {"verdict": verdict, "types": found, "confidence": 0.6 if found or positive else 0.3,
+                     "photo_role": "no_help", "explanation": "Mock model: keyword rules on the review text."}
+        return ModelReply(text=json.dumps(reply), prompt_tokens=tokens, completion_tokens=60)
 
 
 RETRY_STATUS = {429, 500, 502, 503, 504}

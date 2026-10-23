@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from looplens import __version__, config
 from looplens.data import Case, load_cases
 from looplens.model import ModelClient
+from looplens.pipeline import PipelineResult, run_pipeline
 from looplens.single_model import CheckResult, check_case
 from looplens.taxonomy import Taxonomy, load_taxonomy
 
@@ -45,3 +46,12 @@ def get_case(case_id: str) -> Case:
 def run_single_model(case_id: str) -> CheckResult:
     """Check one case with the single-model baseline."""
     return check_case(get_case(case_id), _tax, _client)
+
+
+@app.post("/cases/{case_id}/pipeline", response_model=PipelineResult)
+def run_agent_pipeline(case_id: str, mode: str = "smart") -> PipelineResult:
+    """Check one case with the agent pipeline (mode = smart or full)."""
+    if mode not in ("smart", "full"):
+        raise HTTPException(400, "mode must be 'smart' or 'full'")
+    return run_pipeline(get_case(case_id), _tax, _client, mode=mode)
+
