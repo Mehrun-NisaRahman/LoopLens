@@ -1,7 +1,7 @@
 case_id,verdict,types,photo_role,note
 af09d739a7c2,mismatch,missing_parts,confirms,Listing says dish holder with lid; lid missing (review and photo)
 b31ba2f7bc6a,mismatch,quality_far_below,confirms,Arrived fine; flower fell off during use - cheaply made
-71f8ac7c7002,unclear,,no_help,Listing photo is a sold-out banner not the product; review positive
+71f8ac7c7002,match,,confirms,Listing photo is a sold-out banner; customer satisfied and photo shows the lashes (reviewed)
 0d2a8d93c74b,match,,confirms,Very sharp and effective
 3c981c0df0fb,mismatch,feature_claim_false,confirms,Sold as loofah sponges; barely fluff up and do not absorb
 e28d906fe7c5,match,,no_help,Hair beautiful; colour stunning; no shedding
@@ -16,12 +16,12 @@ caef13319bfd,match,,confirms,Nice smooth creamy lip balm
 0bcb40fa65aa,match,,confirms,Cute cap; soft fabric
 cee71db1a678,mismatch,feature_claim_false;damaged_defective,no_help,Listing claims no shedding; sheds after first wash; loose track
 be55362c494b,match,,confirms,Matches listing photo; customer satisfied
-5b30f040c437,match,,no_help,Photo shows the result (curls) not the curlers; review positive
+5b30f040c437,match,,no_help,Happy with results; minor complaint accepted at 4 stars (reviewed)
 58c6c1b27669,match,,confirms,Matches photo; not the best on the market is opinion
 ed378f2c3e83,match,,confirms,Listing photo looks large but title says medium; customer got medium
 fa2f7eceb842,match,,confirms,Velvety smooth like advertised
 42495711d316,match,,confirms,Fun at a reasonable price
-6d3b945d2609,unclear,,no_help,Customer photo unclear; says product not good
+6d3b945d2609,mismatch,quality_far_below,no_help,Melted and broke down during normal use (reviewed)
 06815a70178a,match,,confirms,Super cute and do the job
 0b57d91c08fc,match,,confirms,Works great; a little hard to attach
 73563c8f01b4,mismatch,wrong_item,no_help,Review says item is a sample not meant for sale; photo shows only the box

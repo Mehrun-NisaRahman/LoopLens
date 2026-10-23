@@ -14,8 +14,11 @@ rules:
   - Use all the evidence together - listing title, description and photo, the review text and the customer photo.
   - A specific statement in the review ("came with 200, not 1000", "lid missing") is enough for mismatch, even if the photo cannot show it.
   - Dislike, opinion or a low rating alone is NOT a mismatch ("not the best", "hard to put on", "ok for the price").
+  - A colour, shade or size difference the customer does not complain about is NOT a mismatch - listings often have several variants and the customer may have chosen a different one than the main photo shows.
   - If the listing title or description and the listing photo disagree, the written listing is the promise.
-  - If the listing photo is missing or is not the product (e.g. a "sold out" banner), the verdict is unclear unless the review text alone is decisive.
+  - If the listing photo is missing or is not the product (e.g. a "sold out" banner), judge from the written listing, the review and the customer photo. A satisfied customer whose photo shows the described product is a match. Use unclear only when nothing usable is left to compare.
+  - Mixed reviews (praise plus a minor quality complaint) are decided by the star rating - 4-5 stars means the customer accepts the flaw, so match; 1-3 stars means mismatch with quality_far_below.
+  - The star rating never overrides a concrete problem - a missing part, wrong item, wrong quantity or damage on arrival is a mismatch even with 5 stars.
   - Damaged on arrival is damaged_defective; arrived fine but broke during normal use is quality_far_below.
   - Pick the single type that best explains the problem. Add a second type only for a genuinely separate problem.
 

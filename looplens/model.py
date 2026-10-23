@@ -17,6 +17,8 @@ import mimetypes
 from dataclasses import dataclass
 from pathlib import Path
 
+import time
+
 import requests
 
 from . import config
@@ -84,8 +86,7 @@ class ModelClient:
             "temperature": 0,
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": content}],
         }
-        r = requests.post(f"{self.base_url}/chat/completions", headers=headers, json=body, timeout=180)
-        r.raise_for_status()
+        r = _post_with_retry(f"{self.base_url}/chat/completions", headers, body)
         d = r.json()
         usage = d.get("usage") or {}
         return ModelReply(
@@ -116,3 +117,28 @@ class ModelClient:
                  "explanation": "Mock model: keyword rules on the review text."}
         return ModelReply(text=json.dumps(reply), prompt_tokens=len(user) // 4 + 250 * len(images),
                           completion_tokens=60)
+
+
+RETRY_STATUS = {429, 500, 502, 503, 504}
+
+
+def _post_with_retry(url: str, headers: dict, body: dict, tries: int = 6,
+                     sleep=time.sleep) -> requests.Response:
+    """POST, waiting and retrying on rate limits (429) and temporary server errors.
+
+    Free tiers allow only a few requests per minute; instead of crashing we wait
+    (Retry-After header if given, else 5, 10, 20, 40, 60 s) and try again.
+    """
+    for attempt in range(tries):
+        r = requests.post(url, headers=headers, json=body, timeout=180)
+        if r.status_code not in RETRY_STATUS or attempt == tries - 1:
+            r.raise_for_status()
+            return r
+        try:
+            wait = float(r.headers.get("Retry-After", ""))
+        except ValueError:
+            wait = min(60, 5 * 2 ** attempt)
+        print(f"   server said {r.status_code} (rate limit / busy) - waiting {wait:.0f}s, then retrying...")
+        sleep(wait)
+    raise RuntimeError("unreachable")
+
