@@ -14,7 +14,7 @@ d8ad36e57a6f,match,,confirms,Listing gives no size; product matches the listing 
 f7714c2293f5,mismatch,feature_claim_false,no_help,Not coffin shaped and not made of gel
 ef5ddc0c91ae,match,,confirms,Great buy; fun colors
 9b779248a6db,mismatch,damaged_defective,confirms,Hair arrived thin and damaged
-90f82656985e,match,,no_help,Positive review; 4 stars with a small complaint
+90f82656985e,mismatch,damaged_defective,no_help,Re-read: damage despite 4 stars - stars never override damage (rule 7) (reviewed after AI run)
 7a70ac043fb4,mismatch,damaged_defective,confirms,Arrived completely broken and spilling shimmer
 1e1610bbda0b,match,,confirms,High quality product
 1dc6a318556d,match,,confirms,Positive review

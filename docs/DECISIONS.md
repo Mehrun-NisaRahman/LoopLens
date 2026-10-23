@@ -53,3 +53,15 @@ On the 30 week-1 cases both pipeline modes scored 100% (kappa 1.00) vs 97% for t
 But the taxonomy rules were written while looking at those same 30 cases, so the score is optimistic.
 Next: label cases 31-60 *before* looking at any AI output, then compare all setups on that fresh set.
 
+## 9. Held-out result and how to keep it honest (week 2)
+On cases 31-60 (labelled blind): single model 80% / kappa 0.62, both pipelines 83% / 0.68, smart mode using
+23% fewer tokens than full. The drop from 100% confirms the development score was optimistic.
+Rule: these numbers are reported as they are. Any rule or prompt change made after studying cases 31-60
+must be measured on a new, untouched set (cases 61-90) before claiming an improvement.
+
+## 10. One held-out label corrected (week 2)
+90f82656985e: originally `match` (4 stars, small complaint). After the AI flagged damage, the review was re-read:
+the complaint is damage, and rule 7 (stars never override damage) already said `mismatch` / `damaged_defective`.
+This fixes a labelling mistake under an existing rule - no rule was changed - so the held-out set stays valid.
+Held-out after correction: single model 77% / kappa 0.56, both pipelines 87% / kappa 0.75.
+

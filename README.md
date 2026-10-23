@@ -65,6 +65,32 @@ python -m scripts.run_single_model --limit 10
 
 Each call sends the listing photo and the customer photo with the text. Every response is cached in `data/cache/`, so re-running an experiment costs nothing.
 
+## Results so far
+
+Model: `gemini-3.5-flash-lite` (free tier). Data: Amazon Reviews 2023, All_Beauty, reviews with a customer photo.
+Gold labels are hand-made (verdict, mismatch types, photo role); see `data/gold/` and `docs/DECISIONS.md`.
+
+**Held-out set (cases 31-60, labelled before any AI output was seen)** - the honest number:
+
+| Setup | Accuracy | Cohen's kappa | Mismatch F1 | Types F1 | Tokens/case | Calls/case |
+|---|---|---|---|---|---|---|
+| Single model | 77% | 0.56 | 0.77 | 0.54 | 3,303 | 1.0 |
+| Agent pipeline, full | 87% | 0.75 | 0.90 | 0.62 | 5,181 | 3.0 |
+| Agent pipeline, smart routing | 87% | 0.75 | 0.90 | 0.62 | 3,969 | 2.4 |
+
+**Development set (cases 1-30, used to write the rules):** single model 97%, both pipelines 100%.
+
+What this shows:
+- Writing clear task rules took the single model from kappa 0.69 to 0.91 on the development set.
+- Those rules were tuned on the same cases, so the development score is optimistic; the held-out set is the real one.
+- Smart routing (skip photos when the text is a clear, complaint-free match) matched full mode's accuracy
+  with 23% fewer tokens.
+- The pipeline beats the single model by 3 cases in 30 (87% vs 77%) - promising, but needs a bigger test set to be sure.
+- One held-out label (90f82656985e) was corrected after the AI run: the reviewer re-read it and the AI was right
+  under an existing rule (damage beats stars). Logged in `docs/DECISIONS.md` #10.
+
+Reproduce: `python -m scripts.compare --gold data/gold/heldout_labels.csv`
+
 ## Project layout
 
 | Path | What it is |
