@@ -1,0 +1,31 @@
+case_id,verdict,types,photo_role,note
+3ee1d1261255,mismatch,feature_claim_false,no_help,Claims to remove waterproof mascara but package says avoid eye contact
+a0294ebda199,match,,confirms,Positive review; 5 stars with a small complaint
+543bb44d249f,mismatch,quality_far_below,confirms,Loops are too small; poorly made
+489fa3a065ca,match,,confirms,Positive review
+3636fccfbc63,mismatch,damaged_defective;quality_far_below,confirms,Defective and disappointing
+e47499b01810,mismatch,damaged_defective,confirms,Large stone already detached and loose
+9f6fad55d2f0,mismatch,damaged_defective,confirms,Damaged upon arrival
+99530bdffeeb,mismatch,feature_claim_false,confirms,Sold as moonstone jade rollers but made of resin
+def45b21542c,match,,confirms,Positive review
+b9431465a209,match,,confirms,Positive review
+a8c53decc201,match,,confirms,Positive review
+bcf9e3d21217,match,,confirms,Positive review
+4d21ffe91591,match,,no_help,Positive review
+a8f9de70ff7e,mismatch,damaged_defective,confirms,Lipstick totally melted all over the container
+c472e5e8da01,match,,confirms,Positive review
+5e3a4d6a100b,match,,confirms,Positive review
+1a4310ff2888,match,,confirms,Positive review; 4 stars with small complaints
+b91775f85ea4,match,,confirms,Positive review; 4 stars with small complaints
+ed01f340233d,mismatch,damaged_defective,confirms,Arrived broken
+5e7706f61e13,mismatch,damaged_defective,confirms,Arrived damaged
+31e0231885f1,mismatch,feature_claim_false,confirms,Sold as infinity cotton crinkle knit scarf; is a chiffon-like blend and not an infinity scarf
+4285c18e871a,mismatch,quality_far_below,no_help,Updated review says it runs out way too fast
+8f89cf0aba7c,mismatch,missing_parts,confirms,Missing 2 tubes
+e165fb4f9128,match,,confirms,Positive review
+3018b2cc6c9e,mismatch,size_quantity,no_help,Only 12 nails in mixed sizes; could only fit one hand
+ee42959991b1,mismatch,quality_far_below,no_help,Very cheaply made; motor went out two weeks after purchase
+abde9ca61b24,mismatch,quality_far_below,confirms,Hard bristles; chemical smell; silver part keeps coming off
+c934cff12927,mismatch,size_quantity,confirms,Sold as adult size but way too small for most adults (type set by size rule)
+6ad4635a0c0f,match,,confirms,Positive review
+3d0d32f94d9d,match,,confirms,Positive review

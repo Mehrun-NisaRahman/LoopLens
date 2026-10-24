@@ -65,3 +65,10 @@ the complaint is damage, and rule 7 (stars never override damage) already said `
 This fixes a labelling mistake under an existing rule - no rule was changed - so the held-out set stays valid.
 Held-out after correction: single model 77% / kappa 0.56, both pipelines 87% / kappa 0.75.
 
+## 11. Stricter on mild quality complaints; optional stronger Judge (week 2, v2)
+Held-out errors e9bde98a7c95, b6b701188fc4 and e2dd3cf1ed1d were all mild-sounding quality complaints the AI let pass.
+New rule: a specific negative statement about how the product performs or is made is a complaint; at 1-3 stars it is
+a mismatch (quality_far_below, or counterfeit_suspected when it differs from the genuine product the customer knows).
+The Router prompt now lists such statements as complaints. The Judge can use a different model (`--judge-model`).
+Because these changes came from studying cases 31-60, v2 is measured only on the untouched test set (cases 61-90).
+

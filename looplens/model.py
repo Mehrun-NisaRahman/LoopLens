@@ -138,11 +138,20 @@ def _post_with_retry(url: str, headers: dict, body: dict, tries: int = 6,
                      sleep=time.sleep) -> requests.Response:
     """POST, waiting and retrying on rate limits (429) and temporary server errors.
 
+    Also retries when the server does not answer at all (timeout / dropped connection).
     Free tiers allow only a few requests per minute; instead of crashing we wait
     (Retry-After header if given, else 5, 10, 20, 40, 60 s) and try again.
     """
     for attempt in range(tries):
-        r = requests.post(url, headers=headers, json=body, timeout=180)
+        try:
+            r = requests.post(url, headers=headers, json=body, timeout=180)
+        except (requests.Timeout, requests.ConnectionError) as e:
+            if attempt == tries - 1:
+                raise
+            wait = min(60, 5 * 2 ** attempt)
+            print(f"   no answer from the server ({type(e).__name__}) - waiting {wait:.0f}s, then retrying...")
+            sleep(wait)
+            continue
         if r.status_code not in RETRY_STATUS or attempt == tries - 1:
             r.raise_for_status()
             return r

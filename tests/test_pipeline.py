@@ -52,3 +52,17 @@ def test_skip_rule_is_conservative():
     assert not can_skip_photos({"text_verdict": "match", "complaints": ["rod ripped"], "confidence": 0.9}, case)
     assert not can_skip_photos({"text_verdict": "match", "complaints": [], "confidence": 0.5}, case)
     assert not can_skip_photos({"text_verdict": "match", "complaints": [], "confidence": 0.9}, _case("Good."))
+
+
+def test_judge_can_use_a_different_client(tmp_path):
+    calls = []
+
+    class Spy(ModelClient):
+        def complete(self, system, user, images=None):
+            calls.append(system[:20])
+            return super().complete(system, user, images)
+
+    res = run_pipeline(_case(ANGRY, tmp_path, rating=1), TAX, MOCK, mode="full",
+                       judge_client=Spy(provider="mock"))
+    assert res.verdict == "mismatch"
+    assert calls == ["[agent:judge] You ma"]  # only the Judge went to the second client

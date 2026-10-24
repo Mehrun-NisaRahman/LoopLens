@@ -49,8 +49,10 @@ END OF REVIEW
 
 Tasks:
 1. List every specific complaint the customer makes about the item they received, in a few words each
-   (e.g. "lid missing", "rod ripped during use"). Use an empty list if there are none.
-   Pure opinions ("not for me", "smells odd to me") are not complaints.
+   (e.g. "lid missing", "rod ripped during use", "poor quality - coarser than expected",
+   "not the same as the genuine product I used before"). Use an empty list if there are none.
+   Negative statements about how the product performs or is made ARE complaints, even when mild.
+   Pure personal taste ("not for me", "smells odd to me") is not a complaint.
 2. Give your verdict from the text alone, following the rules above.
 3. Say how confident you are (0.0-1.0).
 
@@ -177,10 +179,12 @@ def can_skip_photos(router: dict, case: Case) -> bool:
 
 # --------------------------------------------------------------------------- run
 def run_pipeline(case: Case, tax: Taxonomy, client: ModelClient | None = None,
-                 mode: str = "smart") -> PipelineResult:
+                 mode: str = "smart", judge_client: ModelClient | None = None) -> PipelineResult:
+    """Run the agents on one case. `judge_client` lets the Judge use a different (e.g. stronger) model."""
     if mode not in ("full", "smart"):
         raise ValueError("mode must be 'full' or 'smart'")
     client = client or ModelClient()
+    judge_client = judge_client or client
     steps: list[Step] = []
     fields = dict(taxonomy=tax.as_prompt(), title=case.listing.title or "(none)",
                   description=(case.listing.description or "(none)")[:1500],
@@ -226,7 +230,7 @@ def run_pipeline(case: Case, tax: Taxonomy, client: ModelClient | None = None,
     # 3. Judge ---------------------------------------------------------------
     raw_router = json.dumps({k: router.get(k) for k in ("complaints", "text_verdict", "confidence", "reason")},
                             ensure_ascii=False)
-    reply = client.complete(JUDGE_SYSTEM, JUDGE_USER.format(**fields, router=raw_router,
+    reply = judge_client.complete(JUDGE_SYSTEM, JUDGE_USER.format(**fields, router=raw_router,
                                                             inspector=inspector_text), [])
     judge = parse_check(reply.text, tax)
     raw_judge = _json(reply.text) or {}

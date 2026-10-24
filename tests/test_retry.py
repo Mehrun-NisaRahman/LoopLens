@@ -35,3 +35,18 @@ def test_client_error_not_retried(monkeypatch):
     with pytest.raises(requests.HTTPError):
         model._post_with_retry("u", {}, {}, sleep=lambda s: None)
     assert len(calls) == 1
+
+
+def test_timeout_is_retried(monkeypatch):
+    outcomes = iter([requests.Timeout("slow"), requests.ConnectionError("dropped"), FakeResp(200)])
+
+    def post(*a, **k):
+        o = next(outcomes)
+        if isinstance(o, Exception):
+            raise o
+        return o
+
+    monkeypatch.setattr(model.requests, "post", post)
+    waits = []
+    assert model._post_with_retry("u", {}, {}, sleep=waits.append).status_code == 200
+    assert waits == [5, 10]

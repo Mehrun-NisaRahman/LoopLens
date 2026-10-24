@@ -16,4 +16,6 @@ Modes: `full` (always inspect photos) vs `smart` (skip photos for a confident, c
 - [ ] `python -m scripts.compare` and save the table in the README
 - [ ] Read the disagreements: where does the pipeline beat / lose to the single model?
 - [ ] Label 30 more gold cases (small sets hide real differences)
+- [ ] v2 (stricter quality rule): label cases 61-90 blind, then run all setups with --start 61 --limit 30 --tag v2
+- [ ] Stronger Judge: --judge-model gemini-3.8-flash --tag v2_judge38
 - [ ] Later: Explainer agent and the human confirm/overrule step

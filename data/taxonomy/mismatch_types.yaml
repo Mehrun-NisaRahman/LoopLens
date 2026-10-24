@@ -17,6 +17,7 @@ rules:
   - A colour, shade or size difference the customer does not complain about is NOT a mismatch - listings often have several variants and the customer may have chosen a different one than the main photo shows.
   - If the listing title or description and the listing photo disagree, the written listing is the promise.
   - If the listing photo is missing or is not the product (e.g. a "sold out" banner), judge from the written listing, the review and the customer photo. A satisfied customer whose photo shows the described product is a match. Use unclear only when nothing usable is left to compare.
+  - A specific negative statement about how the product performs or is made counts as a complaint, even without dramatic words - e.g. "not a good buffer", "less than 100 grit", "quality has dropped", "not the product I used before". In a 1-3 star review such a complaint is a mismatch - quality_far_below, or counterfeit_suspected when the customer says it differs from the genuine product they know.
   - Mixed reviews (praise plus a minor quality complaint) are decided by the star rating - 4-5 stars means the customer accepts the flaw, so match; 1-3 stars means mismatch with quality_far_below.
   - The star rating never overrides a concrete problem - a missing part, wrong item, wrong quantity or damage on arrival is a mismatch even with 5 stars.
   - Damaged on arrival is damaged_defective; arrived fine but broke during normal use is quality_far_below.

@@ -3,6 +3,7 @@
 Usage:
     python -m scripts.run_single_model --limit 10    # try 10 cases first
     python -m scripts.run_single_model               # all cases
+    python -m scripts.run_single_model --start 61 --limit 30 --tag v2
 Output: data/results/single_model.jsonl  (+ a summary in the terminal)
 """
 from __future__ import annotations
@@ -24,11 +25,13 @@ from looplens.taxonomy import load_taxonomy  # noqa: E402
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=None)
+    ap.add_argument("--start", type=int, default=1, help="number of the first case (1 = first)")
+    ap.add_argument("--tag", default="", help="added to the output file name, e.g. v2")
     args = ap.parse_args()
 
     tax, client = load_taxonomy(), ModelClient()
-    cases = load_cases()[: args.limit]
-    out = config.DATA / "results" / "single_model.jsonl"
+    cases = load_cases()[max(1, args.start) - 1:][: args.limit]
+    out = config.DATA / "results" / ("single_model" + (f"_{args.tag}" if args.tag else "") + ".jsonl")
     out.parent.mkdir(parents=True, exist_ok=True)
     verdicts, types, tokens, errors = Counter(), Counter(), 0, 0
     with out.open("w", encoding="utf-8") as f:
