@@ -65,31 +65,39 @@ python -m scripts.run_single_model --limit 10
 
 Each call sends the listing photo and the customer photo with the text. Every response is cached in `data/cache/`, so re-running an experiment costs nothing.
 
-## Results so far
+## Results
 
 Model: `gemini-3.5-flash-lite` (free tier). Data: Amazon Reviews 2023, All_Beauty, reviews with a customer photo.
 Gold labels are hand-made (verdict, mismatch types, photo role); see `data/gold/` and `docs/DECISIONS.md`.
+90 cases in three sets: development (1-30), held-out (31-60) and a final test set (61-90).
 
-**Held-out set (cases 31-60, labelled before any AI output was seen)** - the honest number:
+**Final test set (cases 61-90, labelled blind, never used to change anything):**
 
-| Setup | Accuracy | Cohen's kappa | Mismatch F1 | Types F1 | Tokens/case | Calls/case |
+| Setup (v2 rules) | Accuracy | Cohen's kappa | Mismatch F1 | Types F1 | Tokens/case | Calls/case |
 |---|---|---|---|---|---|---|
-| Single model | 77% | 0.56 | 0.77 | 0.54 | 3,303 | 1.0 |
-| Agent pipeline, full | 87% | 0.75 | 0.90 | 0.62 | 5,181 | 3.0 |
-| Agent pipeline, smart routing | 87% | 0.75 | 0.90 | 0.62 | 3,969 | 2.4 |
+| Single model | 97% | 0.93 | 0.97 | 0.72 | **3,333** | 1.0 |
+| Agent pipeline, full | 97% | 0.93 | 0.97 | **0.74** | 5,335 | 3.0 |
+| Agent pipeline, smart routing | 97% | 0.93 | 0.97 | **0.74** | 3,898 | 2.3 |
+| Smart routing + stronger Judge (`gemini-3.8-flash`) | 97% | 0.93 | 0.97 | 0.69 | 3,896 | 2.3 |
 
-**Development set (cases 1-30, used to write the rules):** single model 97%, both pipelines 100%.
+**Held-out set (cases 31-60, v1 rules):** single model 77% (kappa 0.56), both pipelines 87% (kappa 0.75).
+**Development set (cases 1-30):** single model 97%, pipelines 100% - optimistic, the rules were written on these cases.
 
-What this shows:
-- Writing clear task rules took the single model from kappa 0.69 to 0.91 on the development set.
-- Those rules were tuned on the same cases, so the development score is optimistic; the held-out set is the real one.
-- Smart routing (skip photos when the text is a clear, complaint-free match) matched full mode's accuracy
-  with 23% fewer tokens.
-- The pipeline beats the single model by 3 cases in 30 (87% vs 77%) - promising, but needs a bigger test set to be sure.
-- One held-out label (90f82656985e) was corrected after the AI run: the reviewer re-read it and the AI was right
-  under an existing rule (damage beats stars). Logged in `docs/DECISIONS.md` #10.
+What I learned:
+- **Clear task rules mattered most.** Writing precise rules (variants are not mismatches, arrival damage vs. breaking
+  in use, star rating for mixed reviews, mild quality complaints count) lifted the single model from kappa 0.56 on
+  held-out (v1) to 0.93 on a fresh test set (v2).
+- **Agents help when the rules are weak, not when they are strong.** With v1 rules the pipeline beat the single model
+  by 10 points; with v2 rules all setups tie. The pipeline still adds a photo role and a plain-English explanation
+  per case, and slightly better mismatch types.
+- **Smart routing saves 27% of tokens vs. full mode** (skipping photos on clear, complaint-free reviews) with no
+  accuracy loss on any set.
+- **A bigger Judge model did not pay off:** same verdicts, slightly worse types, and far slower and less reliable on
+  the free tier (timeouts and 503s).
+- All setups miss case 3ee1d1261255: a mascara remover whose own packaging says "avoid eye contact" - a subtle
+  contradiction a careful human caught.
 
-Reproduce: `python -m scripts.compare --gold data/gold/heldout_labels.csv`
+Reproduce: `python -m scripts.compare --gold data/gold/test_labels.csv`
 
 ## Project layout
 

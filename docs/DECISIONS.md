@@ -72,3 +72,9 @@ a mismatch (quality_far_below, or counterfeit_suspected when it differs from the
 The Router prompt now lists such statements as complaints. The Judge can use a different model (`--judge-model`).
 Because these changes came from studying cases 31-60, v2 is measured only on the untouched test set (cases 61-90).
 
+## 12. Final test result and what to keep (week 2)
+Test set 61-90 (blind): single model, full and smart pipelines all 97% / kappa 0.93; a stronger Judge
+(gemini-3.8-flash) gave the same verdicts, lower types F1 (0.69 vs 0.74) and many timeouts.
+Keep: v2 rules, smart routing (same accuracy, 27% fewer tokens than full) with the Flash-Lite Judge.
+Default for the app: the smart pipeline, because it also returns a photo role and a seller-readable explanation.
+

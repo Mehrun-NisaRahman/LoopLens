@@ -24,7 +24,8 @@ def main() -> None:
     if not files:
         print("No results yet. Run scripts.run_single_model or scripts.run_pipeline first.")
         return
-    head = f"{'setup':<16}{'cases':>6}{'accuracy':>10}{'kappa':>7}{'mism. F1':>10}{'types F1':>10}" \
+    width = max(16, *(len(f.stem) + 2 for f in files))
+    head = f"{'setup':<{width}}{'cases':>6}{'accuracy':>10}{'kappa':>7}{'mism. F1':>10}{'types F1':>10}" \
            f"{'tokens/case':>13}{'calls/case':>12}"
     print(head)
     print("-" * len(head))
@@ -32,7 +33,7 @@ def main() -> None:
         rep = score(gold, load_preds(f))
         if rep.n == 0:
             continue
-        print(f"{f.stem:<16}{rep.n:>6}{rep.accuracy:>10.0%}{rep.kappa:>7.2f}{rep.mismatch_prf[2]:>10.2f}"
+        print(f"{f.stem:<{width}}{rep.n:>6}{rep.accuracy:>10.0%}{rep.kappa:>7.2f}{rep.mismatch_prf[2]:>10.2f}"
               f"{rep.types_prf[2]:>10.2f}{rep.tokens_per_case:>13,.0f}{rep.calls_per_case:>12.1f}")
 
 
