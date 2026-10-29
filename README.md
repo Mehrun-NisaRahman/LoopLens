@@ -65,6 +65,21 @@ python -m scripts.run_single_model --limit 10
 
 Each call sends the listing photo and the customer photo with the text. Every response is cached in `data/cache/`, so re-running an experiment costs nothing.
 
+## Review app (AI checks, you decide)
+
+```
+uvicorn app.main:app --reload
+```
+Open http://127.0.0.1:8000 and pick a saved AI run at the top (e.g. `pipeline_smart_v2`).
+
+- See the listing and what the customer received side by side, with LoopLens's verdict, mismatch types,
+  photo role, explanation and the agent steps behind it.
+- **Confirm** (key `C`) or **Overrule** (key `O`) - an overrule asks for the right verdict, types and a short reason.
+- The header keeps score: how many cases you reviewed and how often you agreed with the AI.
+  "Why I overrule" shows your most common reasons - repeated reasons point to a rule that needs changing.
+- `J` / `K` move to the next / previous case. Cases without a saved result can be run live (uses your API key).
+- Reviews are saved in `data/reviews/reviews.jsonl`; the latest review of a case wins.
+
 ## Results
 
 Model: `gemini-3.5-flash-lite` (free tier). Data: Amazon Reviews 2023, All_Beauty, reviews with a customer photo.

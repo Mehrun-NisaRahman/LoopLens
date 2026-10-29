@@ -1,0 +1,5 @@
+{"case_id":"3ee1d1261255","setup":"pipeline_smart_v2","decision":"overrule","ai_verdict":"match","ai_types":[],"final_verdict":"mismatch","final_types":["feature_claim_false"],"reason":"","at":"2026-10-29T00:56:05+00:00"}
+{"case_id":"a0294ebda199","setup":"pipeline_smart_v2","decision":"confirm","ai_verdict":"match","ai_types":[],"final_verdict":"match","final_types":[],"reason":"","at":"2026-10-29T00:56:54+00:00"}
+{"case_id":"543bb44d249f","setup":"pipeline_smart_v2","decision":"confirm","ai_verdict":"mismatch","ai_types":["wrong_item","quality_far_below"],"final_verdict":"mismatch","final_types":["wrong_item","quality_far_below"],"reason":"","at":"2026-10-29T00:57:45+00:00"}
+{"case_id":"489fa3a065ca","setup":"pipeline_smart_v2","decision":"confirm","ai_verdict":"match","ai_types":[],"final_verdict":"match","final_types":[],"reason":"","at":"2026-10-29T01:11:10+00:00"}
+{"case_id":"def45b21542c","setup":"pipeline_smart_v2","decision":"confirm","ai_verdict":"match","ai_types":[],"final_verdict":"match","final_types":[],"reason":"","at":"2026-10-29T01:13:00+00:00"}

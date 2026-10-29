@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LoopLens Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0812; --panel:#141020; --panel2:#1c1630; --line:#2b2342; --text:#f3eefc; --muted:#a59bbf; --faint:#6f6690;
+  --rose:#ff4d8d; --ice:#8fd3ff; --amber:#ffc48a; --violet:#9b7bff; --green:#5fe0a7;
+  --match:var(--green); --mismatch:var(--rose); --unclear:var(--amber);
+  --r:14px; --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font:15px/1.5 "Space Grotesk",system-ui,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--ice)}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh}
+
+/* header */
+header{display:flex;align-items:center;gap:18px;padding:12px 20px;border-bottom:1px solid var(--line);background:#0e0a17;flex-wrap:wrap}
+.logo{font:600 18px Unbounded,sans-serif;letter-spacing:.02em;display:flex;align-items:center;gap:10px}
+.logo i{width:22px;height:22px;border-radius:50%;background:conic-gradient(var(--rose),var(--violet),var(--ice),var(--rose));display:inline-block;
+  -webkit-mask:radial-gradient(circle,transparent 5px,#000 6px);mask:radial-gradient(circle,transparent 5px,#000 6px)}
+.logo small{font:500 12px "Space Grotesk",system-ui,sans-serif;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.spacer{flex:1}
+.stat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1}
+.stat b{font-size:18px}
+.stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+select{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+.btn-ghost{background:none;border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer}
+.btn-ghost:hover{border-color:var(--violet)}
+
+/* layout */
+.main{display:grid;grid-template-columns:320px 1fr;min-height:0}
+aside{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:#0e0a17}
+.filters{display:flex;gap:6px;padding:12px;flex-wrap:wrap}
+.chipbtn{border:1px solid var(--line);background:none;border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer;color:var(--muted)}
+.chipbtn.on{background:var(--panel2);color:var(--text);border-color:var(--violet)}
+.search{margin:0 12px 10px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+.list{overflow:auto;flex:1;padding:0 8px 12px}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:10px;cursor:pointer;border:1px solid transparent}
+.item:hover{background:var(--panel)}
+.item.on{background:var(--panel2);border-color:var(--line)}
+.num{font:600 12px var(--mono);color:var(--faint);min-width:28px}
+.item .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.item .s{font:12px var(--mono);color:var(--faint)}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.st{font-size:12px;color:var(--muted)}
+.st.confirm{color:var(--green)} .st.overrule{color:var(--amber)}
+
+/* case */
+section.case{overflow:auto;padding:22px 26px 120px}
+.casehead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.casehead h1{font:600 20px Unbounded,sans-serif;margin:0}
+.mono{font-family:var(--mono);color:var(--muted);font-size:13px}
+.stars{color:var(--amber);letter-spacing:2px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.card h2{margin:0 0 10px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.photo{width:100%;height:min(38vh,340px);object-fit:contain;background:#07050c;border-radius:10px;border:1px solid var(--line);cursor:zoom-in}
+.nophoto{height:min(38vh,340px);display:grid;place-items:center;color:var(--faint);border:1px dashed var(--line);border-radius:10px}
+.card h3{margin:12px 0 6px;font-size:16px}
+.desc{color:var(--muted);font-size:14px;max-height:9.5em;overflow:hidden;position:relative}
+.desc.open{max-height:none}
+.more{background:none;border:0;color:var(--ice);cursor:pointer;padding:4px 0;font-size:13px}
+.review-text{white-space:pre-wrap}
+
+/* verdict */
+.verdict{margin-bottom:16px;display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.badge{display:inline-flex;align-items:center;gap:8px;font:600 15px Unbounded,sans-serif;padding:6px 14px;border-radius:999px;border:1px solid}
+.badge.match{color:var(--match);border-color:color-mix(in srgb,var(--match) 50%,transparent);background:color-mix(in srgb,var(--match) 10%,transparent)}
+.badge.mismatch{color:var(--mismatch);border-color:color-mix(in srgb,var(--mismatch) 50%,transparent);background:color-mix(in srgb,var(--mismatch) 10%,transparent)}
+.badge.unclear{color:var(--unclear);border-color:color-mix(in srgb,var(--unclear) 50%,transparent);background:color-mix(in srgb,var(--unclear) 10%,transparent)}
+.tag{display:inline-block;font:12px var(--mono);padding:3px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);margin:4px 4px 0 0}
+.explain{font-size:15px;margin:12px 0 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv span:nth-child(odd){color:var(--muted)}
+.bar{height:6px;background:var(--panel2);border-radius:6px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--violet),var(--ice))}
+details{margin-top:12px}
+summary{cursor:pointer;color:var(--ice);font-size:14px}
+pre{white-space:pre-wrap;font:12px/1.5 var(--mono);background:#07050c;border:1px solid var(--line);border-radius:10px;padding:10px;color:#d8d0ee;max-height:320px;overflow:auto}
+.step{margin-top:10px}
+.step b{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--violet)}
+.gold{margin-top:10px;font-size:14px;color:var(--muted)}
+
+/* action bar */
+.actions{position:fixed;left:320px;right:0;bottom:0;background:rgba(14,10,23,.94);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:12px 26px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:10px 18px;font-weight:600;cursor:pointer}
+.btn kbd{font:11px var(--mono);opacity:.7;margin-left:8px;border:1px solid currentColor;border-radius:4px;padding:0 4px}
+.btn.confirm{background:var(--green);color:#06210f}
+.btn.overrule{background:var(--panel2);color:var(--amber);border:1px solid var(--amber)}
+.btn.primary{background:var(--violet);color:#120a2a}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.saved{font-size:14px;color:var(--muted)}
+.form{display:none;width:100%;gap:12px;flex-direction:column;padding-top:6px}
+.form.open{display:flex}
+.radios,.checks{display:flex;gap:8px;flex-wrap:wrap}
+.radios label,.checks label{border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:14px}
+.radios input,.checks input{accent-color:var(--violet)}
+.reason{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
+.err{color:var(--rose);font-size:14px}
+.empty{color:var(--muted);text-align:center;margin-top:18vh}
+.toast{position:fixed;top:72px;right:16px;z-index:5;max-width:min(560px,90vw);background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:10px;opacity:0;transition:opacity .2s}
+.toast.on{opacity:1}
+.zoom{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;place-items:center;z-index:9;cursor:zoom-out}
+.zoom.on{display:grid}.zoom img{max-width:94vw;max-height:94vh}
+.reasons{font-size:13px;color:var(--muted)}
+@media (max-width:900px){
+  .main{grid-template-columns:1fr}
+  aside{max-height:38vh;border-right:0;border-bottom:1px solid var(--line)}
+  .compare,.verdict{grid-template-columns:1fr}
+  .actions{left:0}
+  section.case{padding:16px 16px 160px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo"><i></i>LoopLens <small>AI checks · you decide</small></div>
+    <select id="setup" title="Which saved AI run to review"></select>
+    <div class="spacer"></div>
+    <div class="stat"><b id="sReviewed">0</b><span>reviewed</span></div>
+    <div class="stat"><b id="sAgree">–</b><span>agree with AI</span></div>
+    <div class="stat"><b id="sOver">0</b><span>overruled</span></div>
+    <button class="btn-ghost" id="btnReasons" title="Most common overrule reasons">Why I overrule</button>
+  </header>
+
+  <div class="main">
+    <aside>
+      <div class="filters" id="filters">
+        <button class="chipbtn on" data-f="all">All</button>
+        <button class="chipbtn" data-f="todo">To review</button>
+        <button class="chipbtn" data-f="match">AI: match</button>
+        <button class="chipbtn" data-f="mismatch">AI: mismatch</button>
+        <button class="chipbtn" data-f="overrule">Overruled</button>
+      </div>
+      <input class="search" id="search" placeholder="Search id or product…">
+      <div class="list" id="list"></div>
+    </aside>
+
+    <section class="case" id="case"><p class="empty">Loading…</p></section>
+  </div>
+</div>
+
+<div class="actions" id="actions" hidden>
+  <button class="btn confirm" id="btnConfirm">Confirm AI<kbd>C</kbd></button>
+  <button class="btn overrule" id="btnOverrule">Overrule<kbd>O</kbd></button>
+  <span class="saved" id="savedNote"></span>
+  <span class="spacer"></span>
+  <button class="btn-ghost" id="btnPrev" title="Previous (K)">↑ Prev</button>
+  <button class="btn-ghost" id="btnNext" title="Next (J)">Next ↓</button>
+  <div class="form" id="form">
+    <div class="radios" id="fVerdict"></div>
+    <div class="checks" id="fTypes"></div>
+    <input class="reason" id="fReason" list="reasonList" maxlength="300" placeholder="Why? (short reason - helps you spot rules that need changing)">
+    <datalist id="reasonList"></datalist>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn primary" id="btnSave">Save overrule</button>
+      <button class="btn-ghost" id="btnCancel">Cancel</button>
+      <span class="err" id="fErr"></span>
+    </div>
+  </div>
+</div>
+
+<div class="zoom" id="zoom"><img alt=""></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const img = p => p ? "/" + String(p).replace(/\\/g, "/").replace(/^\/+/, "") : null;
+const stars = r => r ? "★".repeat(Math.round(r)) + "☆".repeat(5 - Math.round(r)) : "";
+const label = id => id.replace(/_/g, " ");
+const color = v => `var(--${v || "unclear"})`;
+
+let state = { setup: null, rows: [], filter: "all", q: "", current: null, detail: null, tax: null, stats: null };
+try { state.filter = localStorage.getItem("ll.filter") || "all"; } catch (e) {}
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const body = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(body.detail || r.statusText);
+  return body;
+}
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 1800); }
+
+async function loadOverview(setup) {
+  const d = await api("/api/overview" + (setup ? "?setup=" + encodeURIComponent(setup) : ""));
+  state.setup = d.setup; state.rows = d.cases; state.tax = d.taxonomy; showStats(d.stats);
+  $("#setup").innerHTML = d.setups.map(s => `<option ${s === d.setup ? "selected" : ""}>${esc(s)}</option>`).join("") || "<option>no results yet</option>";
+  renderList();
+  if (!state.rows.length) {
+    $("#case").innerHTML = `<div class="empty"><p>No saved AI results yet.</p><p class="mono">python -m scripts.run_pipeline --mode smart --limit 30</p></div>`;
+    $("#actions").hidden = true; return;
+  }
+  const keep = state.rows.find(r => r.id === state.current);
+  openCase(keep ? keep.id : (state.rows.find(r => !r.decision) || state.rows[0]).id);
+}
+
+function showStats(s) {
+  state.stats = s;
+  $("#sReviewed").textContent = s.reviewed;
+  $("#sAgree").textContent = s.agreement == null ? "–" : Math.round(s.agreement * 100) + "%";
+  $("#sOver").textContent = s.overruled;
+  $("#reasonList").innerHTML = (s.top_reasons || []).map(([r]) => `<option value="${esc(r)}">`).join("");
+}
+
+function visibleRows() {
+  const q = state.q.toLowerCase();
+  return state.rows.filter(r => {
+    if (state.filter === "todo" && r.decision) return false;
+    if ((state.filter === "match" || state.filter === "mismatch") && r.ai_verdict !== state.filter) return false;
+    if (state.filter === "overrule" && r.decision !== "overrule") return false;
+    return !q || r.id.includes(q) || (r.title || "").toLowerCase().includes(q) || String(r.n) === q;
+  });
+}
+
+function renderList() {
+  document.querySelectorAll("#filters .chipbtn").forEach(b => b.classList.toggle("on", b.dataset.f === state.filter));
+  const rows = visibleRows();
+  $("#list").innerHTML = rows.map(r => `
+    <div class="item ${r.id === state.current ? "on" : ""}" data-id="${esc(r.id)}">
+      <span class="num">#${r.n ?? "?"}</span>
+      <div style="min-width:0"><div class="t">${esc(r.title || r.review_title || r.id)}</div>
+        <div class="s"><span class="dot" style="background:${color(r.ai_verdict)}"></span> ${esc(r.ai_verdict)} · ${esc(r.id)}</div></div>
+      <span class="st ${r.decision || ""}">${r.decision === "confirm" ? "✓" : r.decision === "overrule" ? "↺" : "•"}</span>
+    </div>`).join("") || `<p class="st" style="padding:12px">Nothing here.</p>`;
+}
+
+async function openCase(id) {
+  state.current = id; renderList();
+  document.querySelector(`.item[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: "nearest" });
+  const d = await api(`/api/cases/${encodeURIComponent(id)}/detail?setup=${encodeURIComponent(state.setup)}`);
+  if (state.current !== id) return;
+  state.detail = d; renderCase(); closeForm();
+}
+
+function photo(p, alt) {
+  const u = img(p);
+  return u ? `<img class="photo" src="${esc(u)}" alt="${esc(alt)}" onerror="this.outerHTML='<div class=nophoto>photo not found</div>'">` : `<div class="nophoto">no photo</div>`;
+}
+
+function renderCase() {
+  const { case: c, n, result: res, review, gold } = state.detail;
+  const L = c.listing;
+  let ai = `<div class="card"><h2>LoopLens says</h2><p class="st">No AI result for this case in <b>${esc(state.setup)}</b>.</p>
+    <button class="btn primary" id="btnRun">Run AI now</button> <span class="st">uses your API key</span></div>`;
+  if (res) {
+    const types = (res.types || []).map(t => `<span class="tag" title="${esc(t.evidence || "")}">${esc(label(t.type))}</span>`).join("");
+    const conf = Math.round((res.confidence ?? 0.5) * 100);
+    const steps = (res.steps || []).map(s => `<div class="step"><b>${esc(label(s.agent))}</b>${s.cached ? ' <span class="st">(saved)</span>' : ""}<pre>${esc(JSON.stringify(s.output, null, 2))}</pre></div>`).join("");
+    ai = `<div class="card">
+        <h2>LoopLens says</h2>
+        <span class="badge ${esc(res.verdict)}">${esc(res.verdict)}</span>
+        <div>${types}</div>
+        <p class="explain">${esc(res.explanation || "")}</p>
+        ${steps ? `<details><summary>How the agents got there</summary>${steps}</details>` : ""}
+      </div>
+      <div class="card"><h2>Details</h2><div class="kv">
+        <span>Confidence</span><span>${conf}%<div class="bar"><i style="width:${conf}%"></i></div></span>
+        ${res.photo_role ? `<span>Photo role</span><span>${esc(label(res.photo_role))}</span>` : ""}
+        ${res.route ? `<span>Route</span><span>${esc(label(res.route))}</span>` : ""}
+        <span>Model calls</span><span>${res.calls ?? 1}</span>
+        <span>Tokens</span><span>${((res.prompt_tokens || 0) + (res.completion_tokens || 0)).toLocaleString()}</span>
+      </div>
+      ${gold ? `<details class="gold"><summary>My gold label (${esc(gold.set)})</summary><p><span class="badge ${esc(gold.verdict)}" style="font-size:12px">${esc(gold.verdict)}</span> ${(gold.types || []).map(t => `<span class="tag">${esc(label(t))}</span>`).join("")}<br>${esc(gold.note)}</p></details>` : ""}
+      </div>`;
+  }
+  $("#case").innerHTML = `
+    <div class="casehead"><h1>Case #${n ?? "?"}</h1><span class="mono">${esc(c.id)}</span><span class="stars" title="${c.rating} stars">${stars(c.rating)}</span></div>
+    <div class="verdict">${ai}</div>
+    <div class="compare">
+      <div class="card"><h2>The listing promised</h2>${photo(L.image_path, "Seller photo")}
+        <h3>${esc(L.title || "(no title)")}</h3>
+        <div class="desc" id="desc">${esc(L.description || "")}</div>
+        ${(L.description || "").length > 400 ? `<button class="more" id="more">Show more</button>` : ""}</div>
+      <div class="card"><h2>The customer received</h2>${photo(c.review_image_path, "Customer photo")}
+        <h3>${esc(c.review_title || "")}</h3><div class="review-text">${esc(c.review_text)}</div></div>
+    </div>
+`;
+  $("#more")?.addEventListener("click", e => { $("#desc").classList.toggle("open"); e.target.textContent = $("#desc").classList.contains("open") ? "Show less" : "Show more"; });
+  $("#btnRun")?.addEventListener("click", runLive);
+  document.querySelectorAll(".photo").forEach(p => p.addEventListener("click", () => { $("#zoom img").src = p.src; $("#zoom").classList.add("on"); }));
+
+  $("#actions").hidden = false;
+  $("#btnConfirm").disabled = $("#btnOverrule").disabled = !res;
+  $("#savedNote").innerHTML = review
+    ? (review.decision === "confirm" ? `✓ You confirmed: <b>${esc(review.final_verdict)}</b>`
+       : `↺ You overruled → <b>${esc(review.final_verdict)}</b> ${review.final_types.map(t => esc(label(t))).join(", ")}${review.reason ? " · “" + esc(review.reason) + "”" : ""}`)
+    : "Not reviewed yet";
+}
+
+async function runLive() {
+  const b = $("#btnRun"); b.disabled = true; b.textContent = "Running…";
+  try {
+    await api(`/api/cases/${encodeURIComponent(state.current)}/run`, { method: "POST" });
+    toast("Saved as setup live_app"); await loadOverview("live_app");
+  } catch (e) { b.disabled = false; b.textContent = "Run AI now"; toast("Error: " + e.message); }
+}
+
+/* review form */
+function openForm() {
+  const res = state.detail?.result; if (!res) return;
+  $("#fVerdict").innerHTML = state.tax.verdicts.map(v => `<label><input type="radio" name="v" value="${v.id}"> ${v.id}</label>`).join("");
+  const ai = new Set((res.types || []).map(t => t.type));
+  $("#fTypes").innerHTML = state.tax.types.map(t => `<label title="${esc(t.definition)}"><input type="checkbox" value="${t.id}" ${ai.has(t.id) ? "checked" : ""}> ${esc(label(t.id))}</label>`).join("");
+  $("#fReason").value = ""; $("#fErr").textContent = "";
+  const sel = state.tax.verdicts.find(v => v.id !== res.verdict); // sensible default: a different verdict
+  document.querySelector(`#fVerdict input[value="${sel.id}"]`).checked = true;
+  syncTypes(); $("#form").classList.add("open"); $("#fReason").focus();
+}
+function closeForm() { $("#form").classList.remove("open"); }
+function syncTypes() {
+  const v = document.querySelector("#fVerdict input:checked")?.value;
+  $("#fTypes").style.display = v === "mismatch" ? "flex" : "none";
+}
+async function submit(decision) {
+  const body = { case_id: state.current, setup: state.setup, decision };
+  if (decision === "overrule") {
+    body.verdict = document.querySelector("#fVerdict input:checked")?.value;
+    body.types = [...document.querySelectorAll("#fTypes input:checked")].map(i => i.value);
+    body.reason = $("#fReason").value;
+  }
+  try {
+    const d = await api("/api/reviews", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    showStats(d.stats);
+    const row = state.rows.find(r => r.id === state.current);
+    row.decision = d.review.decision; row.final_verdict = d.review.final_verdict;
+    toast(decision === "confirm" ? "Confirmed ✓" : "Overruled ↺");
+    closeForm(); next(true);
+  } catch (e) { $("#fErr").textContent = e.message; if (decision === "confirm") toast(e.message); }
+}
+function next(onlyTodo) {
+  const rows = visibleRows(); const i = rows.findIndex(r => r.id === state.current);
+  const after = rows.slice(i + 1).concat(rows.slice(0, i + 1));
+  const target = onlyTodo ? (after.find(r => !r.decision) || rows[i + 1]) : rows[i + 1];
+  if (target) openCase(target.id); else renderList();
+}
+function prev() { const rows = visibleRows(); const i = rows.findIndex(r => r.id === state.current); if (i > 0) openCase(rows[i - 1].id); }
+
+/* events */
+$("#setup").addEventListener("change", e => loadOverview(e.target.value));
+$("#filters").addEventListener("click", e => {
+  const f = e.target.dataset.f; if (!f) return;
+  state.filter = f; try { localStorage.setItem("ll.filter", f); } catch (_) {}
+  renderList();
+  const rows = visibleRows();  // keep the open case in sync with the filtered list
+  if (rows.length && !rows.some(r => r.id === state.current)) openCase(rows[0].id);
+});
+$("#search").addEventListener("input", e => { state.q = e.target.value.trim(); renderList(); });
+$("#list").addEventListener("click", e => { const it = e.target.closest(".item"); if (it) openCase(it.dataset.id); });
+$("#btnConfirm").addEventListener("click", () => submit("confirm"));
+$("#btnOverrule").addEventListener("click", openForm);
+$("#btnCancel").addEventListener("click", closeForm);
+$("#btnSave").addEventListener("click", () => submit("overrule"));
+$("#fVerdict").addEventListener("change", syncTypes);
+$("#fReason").addEventListener("keydown", e => { if (e.key === "Enter") submit("overrule"); });
+$("#btnNext").addEventListener("click", () => next(false));
+$("#btnPrev").addEventListener("click", prev);
+$("#zoom").addEventListener("click", () => $("#zoom").classList.remove("on"));
+$("#btnReasons").addEventListener("click", () => {
+  const r = state.stats?.top_reasons || [];
+  toast(r.length ? r.map(([t, n]) => `${n}× ${t}`).join("  ·  ") : "No overrule reasons yet");
+});
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input,textarea,select")) { if (e.key === "Escape") closeForm(); return; }
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === "c" && !$("#btnConfirm").disabled) { e.preventDefault(); submit("confirm"); }
+  else if (e.key === "o" && !$("#btnOverrule").disabled) { e.preventDefault(); openForm(); }
+  else if (e.key === "j") next(false);
+  else if (e.key === "k") prev();
+  else if (e.key === "Escape") { closeForm(); $("#zoom").classList.remove("on"); }
+});
+
+loadOverview().catch(e => { $("#case").innerHTML = `<p class="empty">Could not reach the API: ${esc(e.message)}</p>`; });
+})();
+</script>
+</body>
+</html>
