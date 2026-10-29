@@ -67,6 +67,12 @@ Each call sends the listing photo and the customer photo with the text. Every re
 
 ## Review app (AI checks, you decide)
 
+![LoopLens review app](docs/screenshots/review-app.png)
+
+Human review of the final test set (cases 61-90, `pipeline_smart_v2`): **30 reviewed, agreed with the AI on 29 (97%)**.
+The one overrule - a makeup remover sold for waterproof mascara whose packaging says "avoid eye contact" - is the
+same case every setup missed.
+
 ```
 uvicorn app.main:app --reload
 ```
