@@ -200,8 +200,12 @@ async function loadOverview(setup) {
     $("#case").innerHTML = `<div class="empty"><p>No saved AI results yet.</p><p class="mono">python -m scripts.run_pipeline --mode smart --limit 30</p></div>`;
     $("#actions").hidden = true; return;
   }
-  const keep = state.rows.find(r => r.id === state.current);
-  openCase(keep ? keep.id : (state.rows.find(r => !r.decision) || state.rows[0]).id);
+  // reopen the case you were on (after a refresh too), as long as it fits the current filter
+  let saved = state.current;
+  if (!saved) { try { saved = localStorage.getItem("ll.case"); } catch (e) {} }
+  const rows = visibleRows().length ? visibleRows() : state.rows;
+  const keep = rows.find(r => r.id === saved);
+  openCase((keep || rows.find(r => !r.decision) || rows[0]).id);
 }
 
 function showStats(s) {
@@ -236,6 +240,7 @@ function renderList() {
 
 async function openCase(id) {
   state.current = id; renderList();
+  try { localStorage.setItem("ll.case", id); } catch (e) {}
   document.querySelector(`.item[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: "nearest" });
   const d = await api(`/api/cases/${encodeURIComponent(id)}/detail?setup=${encodeURIComponent(state.setup)}`);
   if (state.current !== id) return;
